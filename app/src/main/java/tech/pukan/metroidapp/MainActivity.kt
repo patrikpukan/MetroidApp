@@ -21,6 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import dagger.hilt.android.AndroidEntryPoint
 import tech.pukan.metroidapp.core.navigation.Screen
 import tech.pukan.metroidapp.core.navigation.bottomNavItems
@@ -84,7 +86,7 @@ fun MainScreen() {
             composable(Screen.Timetables.route) {
                 TimetablesScreen(
                     onLineClick = { line ->
-                        // Navigate to the first station of the line as an example
+                        // Navigate to the first station of the line with proper error handling
                         if (line.stations.isNotEmpty()) {
                             navController.navigate("station/${line.stations.first().id}")
                         }
@@ -97,7 +99,7 @@ fun MainScreen() {
             composable(Screen.Favorites.route) {
                 FavoritesScreen(
                     onLineClick = { line ->
-                        // Navigate to the first station of the line as an example
+                        // Navigate to the first station of the line with proper error handling
                         if (line.stations.isNotEmpty()) {
                             navController.navigate("station/${line.stations.first().id}")
                         }
@@ -107,14 +109,22 @@ fun MainScreen() {
                     }
                 )
             }
-            composable("station/{stationId}") { backStackEntry ->
-                val stationId = backStackEntry.arguments?.getString("stationId") ?: return@composable
-                StationDetailsScreen(
-                    stationId = stationId,
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
-                )
+            composable(
+                route = "station/{stationId}",
+                arguments = listOf(navArgument("stationId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val stationId = backStackEntry.arguments?.getString("stationId")
+                if (stationId != null) {
+                    StationDetailsScreen(
+                        stationId = stationId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                } else {
+                    // Handle the case where stationId is null - navigate back
+                    navController.popBackStack()
+                }
             }
         }
     }
