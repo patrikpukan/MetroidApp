@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -96,7 +97,7 @@ fun MainScreen() {
             }
             composable(Screen.Favorites.route) {
                 FavoritesScreen(
-                    onLineClick = { line ->
+                    onLineClick = { line -> 
                         // Navigate to the first station of the line as an example
                         if (line.stations.isNotEmpty()) {
                             navController.navigate("station/${line.stations.first().id}")
@@ -108,13 +109,21 @@ fun MainScreen() {
                 )
             }
             composable("station/{stationId}") { backStackEntry ->
-                val stationId = backStackEntry.arguments?.getString("stationId") ?: return@composable
-                StationDetailsScreen(
-                    stationId = stationId,
-                    onBackClick = {
+                val stationId = backStackEntry.arguments?.getString("stationId")
+                if (stationId != null) {
+                    StationDetailsScreen(
+                        stationId = stationId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                } else {
+                    // Handle the case where stationId is null
+                    // Navigate back or show an error
+                    LaunchedEffect(Unit) {
                         navController.popBackStack()
                     }
-                )
+                }
             }
         }
     }

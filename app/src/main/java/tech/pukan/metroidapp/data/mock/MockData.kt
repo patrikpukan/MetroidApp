@@ -98,7 +98,7 @@ object MockData {
                     departures = generateDepartures("Nemocnice Motol")
                 ),
                 Station(
-                    id = "bořislavka",
+                    id = "borislavka",
                     name = "Bořislavka",
                     departures = generateDepartures("Nemocnice Motol")
                 ),
